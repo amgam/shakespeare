@@ -41,6 +41,13 @@ def parse_sonnets(sonnets):
                     sylLeft -= result[partOfSpeech][word]["numSyl"]
             guess_num_syllables(sylLeft, unknowns, result)
             count += 1
+    for pos in result:
+        count = 0
+        sylSum = 0
+        for word in result[pos]:
+            count += float(1)
+            sylSum += float(result[pos][word])
+        result[pos]["AVERAGE_TOKEN"] = float(sylSum/count)
     return result
 
 sonnets = extractor.extractSonnets()
