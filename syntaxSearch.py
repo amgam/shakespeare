@@ -1,4 +1,4 @@
-import heapq, collections, re, sys, time, os, random
+import heapq, collections, re, sys, time, os, random, sonnetParser
 
 ############################################################
 # Abstract interfaces for search problems and search algorithms.
@@ -118,18 +118,26 @@ class SyntaxSearch(SearchProblem):
         return (0, 0)
 
     def isEnd(self, state):
-        return state[1] == len(speechSequence)
+        return state[1] == len(self.speechSequence)
 
     def remaining(self, state):
         result = 0
         for i in range(state[1], len(self.speechSequence)):
             result += self.words[self.speechSequence[i]]["AVERAGE_TOKEN"]
-        return remaining
+        return result
 
-    def succAndCost(self, state)
+    def succAndCost(self, state):
         actions = self.words[self.speechSequence[state[1]]]
         result = []
         for word in actions:
-            result = (word, (state[0] + actions[word]["numSyl"], state[1] + 1), 0 if state[1] + 1 == len(speechSeqence) and state[0] + actions[word]["numSyl"] else 10 - (state[0] + self.remaining(state)))
+            if word != "AVERAGE_TOKEN":
+                result += [(word, (state[0] + actions[word]["numSyl"], state[1] + 1),1000 if state[1] + 1 == len(self.speechSequence) and state[0] + actions[word]["numSyl"] != 10 else 0)]# 10 - (state[0] + self.remaining(state)))]
+        return result
 
-
+ucs = UniformCostSearch()
+lst = ['DT', 'NN', 'POS', 'JJ', 'VB', 'TO', 'VB', 'DT', 'NN']
+words = sonnetParser.parse_sonnets()
+for key in words:
+    print key
+ucs.solve(SyntaxSearch(words, lst))
+print ucs.actions
