@@ -4,7 +4,7 @@ CS221 AI Project on Shakespearean Sonnets
 
 ## Cost Functions
 
-Currently the only cost function available is a shallow NN model as implmented via word2vec.
+Currently the only cost function available is a shallow NN model as implemented via word2vec.
 
 Dependencies include: *nltk and gensim*. These can be installed via
 ```
