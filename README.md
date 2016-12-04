@@ -23,6 +23,7 @@ A window should pop up and goto the Corpora tab and scroll down to find `stopwor
 
 To use the cost function in your code:
 ```python
+from CostFunction import NNCostFunction # put at top of file to use.
 nn = NNCostFunction() # init
 nn.trainModel() #IMPT, queries wont work otherwise.
 
