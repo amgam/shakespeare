@@ -19,13 +19,13 @@ python
 >>> nltk.download()
 ```
 
-A window should pop up and goto the Corpora tab and scroll down to find `stopwords`. Hit download and you should be good to go.
+A window should pop up and goto the Corpora tab and scroll down to find `stopwords` and `shakespeare`. Hit download and you should be good to go.
 
 To use the cost function in your code:
 ```python
 from CostFunction import NNCostFunction # put at top of file to use.
 nn = NNCostFunction() # init
-nn.trainModel() #IMPT, queries wont work otherwise.
+nn.train() #IMPT, queries wont work otherwise.
 
 nn.getSimilarityScore(word1, word2) # returns cosine similarity between the two words
 nn.getWordsSimilarTo(word, 10) # Returns the top 10 words similar to word. 
