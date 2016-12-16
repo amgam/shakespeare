@@ -8,6 +8,11 @@ import numpy as np
 from gensim.models import Word2Vec
 stop = set(stopwords.words('english')) # for global use
 
+
+#For Glove use
+import itertools
+from glove import Corpus, Glove
+
 class Helper(object):
     # Helper Functions
 
@@ -29,15 +34,57 @@ class NNCostFunction(object):
         self.modelName = 'model.txt'
         self.isTrained = False
         self.trainingError = "Model Untrained!"
+        self.glove = ""
 
     # Edited from  https://github.com/okfn/shakespeare/blob/master/contrib/countwords.py
     def shakespeare_words_in_books(self):
         words = []
         for book in nltk.corpus.shakespeare.fileids():
             words.append(nltk.corpus.shakespeare.words(book))
-        return words
+        return words #all the words
 
-    def train(self):
+    def shakespeare_lines(self):
+        with open('shakespeare.txt') as f:
+            content = f.readlines()
+            return map(lambda line: Helper.removeCommonWords(Helper.splitSentence(line), stop), content)
+            # return content
+
+    def trainShake1(self):
+        corpus = Corpus()
+        shakespeare_words = self.shakespeare_words_in_books()
+        # corpus.fit(shakespeare_corpus + sonnets_corpus, window=10)
+        corpus.fit(shakespeare_words, window=10)
+        self.glove = Glove(no_components=100, learning_rate=0.05)
+        self.glove.fit(corpus.matrix, epochs=30, no_threads=4, verbose=True)
+        self.glove.add_dictionary(corpus.dictionary)
+
+    def trainShake2(self):
+        corpus = Corpus()
+        shakespeare_words = self.shakespeare_lines()
+        # corpus.fit(shakespeare_corpus + sonnets_corpus, window=10)
+        corpus.fit(shakespeare_words, window=10)
+        self.glove = Glove(no_components=100, learning_rate=0.05)
+        self.glove.fit(corpus.matrix, epochs=30, no_threads=4, verbose=True)
+        self.glove.add_dictionary(corpus.dictionary)
+
+    def trainOverallGlove(self):
+        corpus = Corpus()
+        shakespeare_lines = self.shakespeare_lines()
+        sonnets = extractSonnets() #152 Sonnet objects
+        sonnet_lines = map(lambda sonnet: map(lambda line: Helper.removeCommonWords(Helper.splitSentence(line), stop),sonnet.first_twelve), sonnets)
+        sonnets_corpus = [word for individual_line in sonnet_lines for word in individual_line]
+
+        corpi = shakespeare_lines + sonnets_corpus
+
+        corpus.fit(corpi, window=10)
+        self.glove = Glove(no_components=100, learning_rate=0.05)
+        self.glove.fit(corpus.matrix, epochs=30, no_threads=4, verbose=True)
+        self.glove.add_dictionary(corpus.dictionary)
+
+    def mostSimilarToGlove(self, word, K=10):
+        return self.glove.most_similar(word, number=K)
+
+    def trainOverallWord2Vec(self):
         if self.isTrained:
             os.remove(self.modelName)
         shakespeare_words = [word for individual_line in self.shakespeare_words_in_books() for word in individual_line]
@@ -53,7 +100,7 @@ class NNCostFunction(object):
         self.isTrained = True
         print "Training done!"
 
-    def trainOnShakespeare(self):
+    def trainOnShakespeareWord2Vec(self):
         if self.isTrained:
             os.remove(self.modelName)
         shakespeare_words = [word for individual_line in self.shakespeare_words_in_books() for word in individual_line]
@@ -64,7 +111,7 @@ class NNCostFunction(object):
         self.isTrained = True
         print "trainOnShakespeare done!"
 
-    def trainOnSonnets(self):
+    def trainOnSonnetsWord2Vec(self):
         if self.isTrained:
             os.remove(self.modelName)
         sonnets = extractSonnets() #152 Sonnet objects
