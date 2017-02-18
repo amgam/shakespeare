@@ -67,6 +67,17 @@ class NNCostFunction(object):
         self.glove.fit(corpus.matrix, epochs=30, no_threads=4, verbose=True)
         self.glove.add_dictionary(corpus.dictionary)
 
+    def trainSonnetsGlove(self):
+        corpus = Corpus()
+        sonnets = extractSonnets() #152 Sonnet objects
+        sonnet_lines = map(lambda sonnet: map(lambda line: Helper.removeCommonWords(Helper.splitSentence(line), stop),sonnet.first_twelve), sonnets)
+        sonnets_corpus = [word for individual_line in sonnet_lines for word in individual_line]
+        # corpus.fit(shakespeare_corpus + sonnets_corpus, window=10)
+        corpus.fit(sonnets_corpus, window=10)
+        self.glove = Glove(no_components=100, learning_rate=0.05)
+        self.glove.fit(corpus.matrix, epochs=30, no_threads=4, verbose=True)
+        self.glove.add_dictionary(corpus.dictionary)
+
     def trainOverallGlove(self):
         corpus = Corpus()
         shakespeare_lines = self.shakespeare_lines()
@@ -115,7 +126,7 @@ class NNCostFunction(object):
         if self.isTrained:
             os.remove(self.modelName)
         sonnets = extractSonnets() #152 Sonnet objects
-        sonnet_lines = map(lambda sonnet: map(lambda line: Helper.removeCommonWords(splitSentence(line), stop),sonnet.first_twelve), sonnets)
+        sonnet_lines = map(lambda sonnet: map(lambda line: Helper.removeCommonWords(Helper.splitSentence(line), stop),sonnet.first_twelve), sonnets)
         sonnets_corpus = [word for individual_line in sonnet_lines for word in individual_line]
         model = Word2Vec(sonnets_corpus, min_count=1)
         model.save(self.modelName)
